@@ -1,12 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
 
-	"github.com/Azure/go-autorest/logger"
-	"github.com/docker/docker/daemon/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,6 +40,12 @@ type FollowersRepoConfig struct {
 	Branch     string
 }
 
+var TempConfigFile = new(config)
+
+// func GetServerConfig() *Server {
+// 	return &tempConfigFile
+// }
+
 func Init() {
 	// What to Initialize: config values
 	// from a file
@@ -52,32 +57,30 @@ func Init() {
 	// read the configFile
 	file, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		logger.Fatalf("Error in reading config file: %v", configFile)
+		fmt.Printf("Error in reading config file: %v", configFile)
 	}
 
-	tempConfigFile := new(config)
-
 	// mapping file into our strcut
-	err = yaml.Unmarshal(file, tempConfigFile)
+	err = yaml.Unmarshal(file, TempConfigFile)
 	if err != nil {
-		logger.Fatalf("error unmarshalling config file: %v\n", err)
+		fmt.Printf("error unmarshalling config file: %v\n", err)
 	}
 	// If env variables are gives which means to change the default values.
 	if debug := os.Getenv("DEBUG"); debug != "" {
 		val, err := strconv.ParseBool(debug)
 		if err != nil {
-			logger.Fatalf("error parsing debug env var: %v\n", err)
+			fmt.Printf("error parsing debug env var: %v\n", err)
 		}
-		tempConfigFile.Server.Debug = val
+		TempConfigFile.Server.Debug = val
 	}
 
 	if port := os.Getenv("PORT"); port != "" {
 		val, err := strconv.Atoi(port)
 		if err != nil {
-			logger.Fatalf("error parsing port env var: %v\n", err)
+			fmt.Printf("error parsing port env var: %v\n", err)
 		}
 		// change the default value of port to value externally provided by user
-		tempConfigFile.Server.Port = val
+		TempConfigFile.Server.Port = val
 	}
 }
 
@@ -92,7 +95,7 @@ func ConfidentialInit() {
 
 	file, err := ioutil.ReadFile(confedentialConfigFile)
 	if err != nil {
-		logger.Fatalf("error reading confedential config file: %v", err)
+		fmt.Printf("error reading confedential config file: %v", err)
 	}
 
 	syncrepoconfig := new(SyncRepoConfig)
@@ -100,7 +103,7 @@ func ConfidentialInit() {
 	// mapping confidential file into confedential custom struct
 	err = yaml.Unmarshal(file, syncrepoconfig)
 	if err != nil {
-		logger.Fatalf("error unmarshalling sync repo config file: %v\n", err)
+		fmt.Printf("error unmarshalling sync repo config file: %v\n", err)
 	}
 
 	// TODO: In future provide option for env, so that user can credential
