@@ -10,21 +10,16 @@ import (
 	"github.com/viveksahu26/syncrepo/pkg/syncrepo"
 )
 
-func main() {
-	// Initialize configuration values like PORT
-	// DEBUG, LOG, SYNC_REPO_PATH
+func init() {
 	config.Init()
 
-	// initialize log
-	//
-
-	// Initialize confidentials values like tokens, password, etc
 	config.ConfidentialInit()
+}
 
-	// The preceding code block instantiates a new Echo server.
+func main() {
 	echoServer := echo.New()
 
-	// get the port
+	// Retrieve the Server port from Server Configuration
 	port := config.GetServerConfig().Port
 
 	// errChan := make(chan error)
@@ -38,20 +33,9 @@ func main() {
 	// init handlers
 	http.InitSyncRepoHttpHandler(echoServer, syncRepoService)
 
-	// server is started on port 8000
-	// echoServer.Logger.Fatal(echoServer.Start(":" + strconv.Itoa(port)))
-
 	errChan := make(chan error)
 
 	go runner(echoServer, port, errChan)
-
-	/*
-		Go’s `net/http` package defines a handler function signature as a f
-		unction that takes in an “http.ResponseWriter” and a “http.Request”.
-
-		The handler type in Echo is a function that takes in an Echo “Context”,
-		and returns an error.
-	*/
 }
 
 func runner(e *echo.Echo, port int, errChan chan error) {
