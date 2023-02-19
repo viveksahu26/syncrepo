@@ -17,10 +17,10 @@ type Services interface {
 }
 
 // struct gitService will implement all methods of GitServices.
-type GitService struct{}
+type gitService struct{}
 
 // Clone: It clones the repository.
-func (g *GitService) Clone(ctx context.Context, path, repoURL, username, token string) (*git.Repository, error) {
+func (g *gitService) Clone(ctx context.Context, path, repoURL, username, token string) (*git.Repository, error) {
 	// add logs: cloning repo
 
 	// cloning requires username and password for private repos
@@ -38,7 +38,7 @@ func (g *GitService) Clone(ctx context.Context, path, repoURL, username, token s
 }
 
 // Push: pushes main repo changes to followers repo
-func (g *GitService) Push(ctx context.Context, repo *git.Repository, remoteName, username, token string) error {
+func (g *gitService) Push(ctx context.Context, repo *git.Repository, remoteName, username, token string) error {
 	// Add log: pushing to remote repo
 
 	err := repo.Push(&git.PushOptions{
@@ -58,7 +58,7 @@ func (g *GitService) Push(ctx context.Context, repo *git.Repository, remoteName,
 	return nil
 }
 
-func (g *GitService) CreateRemote(ctx context.Context, repo *git.Repository, remoteName, repourl string) (*git.Remote, error) {
+func (g *gitService) CreateRemote(ctx context.Context, repo *git.Repository, remoteName, repourl string) (*git.Remote, error) {
 	remote, err := repo.CreateRemote(&config.RemoteConfig{
 		Name: remoteName,
 		URLs: []string{repourl},
@@ -71,7 +71,7 @@ func (g *GitService) CreateRemote(ctx context.Context, repo *git.Repository, rem
 	return remote, nil
 }
 
-func (g *GitService) Checkout(ctx context.Context, repo *git.Repository, branch, commitHash string) error {
+func (g *gitService) Checkout(ctx context.Context, repo *git.Repository, branch, commitHash string) error {
 	workingTree, err := repo.Worktree()
 	if err != nil {
 		// Add Logs: "error getting worktree"
@@ -86,5 +86,5 @@ func (g *GitService) Checkout(ctx context.Context, repo *git.Repository, branch,
 }
 
 func InitGitServices() Services {
-	return &GitService{}
+	return &gitService{}
 }
