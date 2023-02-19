@@ -32,8 +32,8 @@ func (s syncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGit
 	}
 	// so push event is on right branch.
 
-	// get SyncRepoConfig
-	syncrepoconfig := config.SyncRepoConfig{}
+	// get mainRepoConfig
+	mainRepoConfig := config.MainRepoConfig{}
 
 	// Now clone that repository in memory
 	tempRepoDir, err := ioutil.TempDir("", event.Repository.Name)
@@ -47,7 +47,7 @@ func (s syncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGit
 	defer CleanTempDir(tempRepoDir)
 
 	// Now clone that repo in tempRepoDir path
-	repository, err := s.GitService.Clone(ctx, tempRepoDir, syncrepoconfig.RepoURL, "oauth2", syncrepoconfig.Token)
+	repository, err := s.GitService.Clone(ctx, tempRepoDir, mainRepoConfig.RepoURL, "oauth2", mainRepoConfig.Token)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (s syncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGit
 		return err
 	}
 
-	for _, followerConfig := range syncrepoconfig.FollowersRepoConfig {
+	for _, followerConfig := range mainRepoConfig.FollowersRepoConfig {
 
 		// create a remote in cloned repo
 		_, err := s.GitService.CreateRemote(ctx, repository, followerConfig.RemoteName, followerConfig.RepoURL)

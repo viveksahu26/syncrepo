@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var cfg = new(config)
+var repoConfigInfo = new(config)
 
 type config struct {
 	Server Server
@@ -17,30 +17,35 @@ type config struct {
 }
 
 func GetServerConfig() *Server {
-	return &cfg.Server
+	return &repoConfigInfo.Server
 }
 
 func GetLogConfig() *log {
-	return &cfg.Log
+	return &repoConfigInfo.Log
 }
 
+// server related configuration such as PORT, Debug, Timeout
 type Server struct {
 	Port    int
 	Debug   bool
 	Timeout int
 }
 
+// log related configuration such as log level
 type log struct {
 	Level string
 }
 
-type SyncRepoConfig struct {
+// main repo configuration such as repo name, username, token, branch, etc.
+type MainRepoConfig struct {
 	RepoURL             string
 	UserName            string
 	Token               string
 	Branch              string
 	FollowersRepoConfig map[string]FollowersRepoConfig
 }
+
+// followerd repo configuration such as repo name, username, token, branch, etc.
 
 type FollowersRepoConfig struct {
 	RepoURL    string
@@ -50,12 +55,7 @@ type FollowersRepoConfig struct {
 	Branch     string
 }
 
-var TempConfigFile = new(config)
-
-// func GetServerConfig() *Server {
-// 	return &tempConfigFile
-// }
-
+// Initialization of Server Info such as PORT, Debug, Timeout
 func Init() {
 	// What to Initialize: config values
 	// from a file
@@ -71,7 +71,7 @@ func Init() {
 	}
 
 	// mapping file into our strcut
-	err = yaml.Unmarshal(file, TempConfigFile)
+	err = yaml.Unmarshal(file, repoConfigInfo)
 	if err != nil {
 		fmt.Printf("error unmarshalling config file: %v\n", err)
 	}
@@ -81,7 +81,7 @@ func Init() {
 		if err != nil {
 			fmt.Printf("error parsing debug env var: %v\n", err)
 		}
-		TempConfigFile.Server.Debug = val
+		repoConfigInfo.Server.Debug = val
 	}
 
 	if port := os.Getenv("PORT"); port != "" {
@@ -90,10 +90,11 @@ func Init() {
 			fmt.Printf("error parsing port env var: %v\n", err)
 		}
 		// change the default value of port to value externally provided by user
-		TempConfigFile.Server.Port = val
+		repoConfigInfo.Server.Port = val
 	}
 }
 
+// Initialization of Main Repo as well as followers Repo Info
 func ConfidentialInit() {
 	// Providing credential should be prefer in this way.
 	confedentialConfigFile := os.Getenv("SYNC_REPO_CREDENTIAL_PATH")
@@ -108,10 +109,10 @@ func ConfidentialInit() {
 		fmt.Printf("error reading confedential config file: %v", err)
 	}
 
-	syncrepoconfig := new(SyncRepoConfig)
+	mainRepoConfig := new(MainRepoConfig)
 
 	// mapping confidential file into confedential custom struct
-	err = yaml.Unmarshal(file, syncrepoconfig)
+	err = yaml.Unmarshal(file, mainRepoConfig)
 	if err != nil {
 		fmt.Printf("error unmarshalling sync repo config file: %v\n", err)
 	}
