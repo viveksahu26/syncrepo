@@ -9,9 +9,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var cfg = new(config)
+
 type config struct {
 	Server Server
 	Log    log
+}
+
+func GetServerConfig() *Server {
+	return &cfg.Server
+}
+
+func GetLogConfig() *log {
+	return &cfg.Log
 }
 
 type Server struct {
