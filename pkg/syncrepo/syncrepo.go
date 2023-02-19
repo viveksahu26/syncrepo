@@ -12,11 +12,11 @@ import (
 	"github.com/viveksahu26/syncrepo/types"
 )
 
-type SyncRepoService struct {
-	GitService git.GitService
+type syncRepoService struct {
+	GitService git.Services
 }
 
-func (s SyncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGitlab) error {
+func (s syncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGitlab) error {
 	// get the reference and split them. For example: "refs/heads/master"
 	ref := strings.Split(event.Ref, "/")
 
@@ -30,7 +30,7 @@ func (s SyncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGit
 		// Add Log: TODO
 		return nil
 	}
-	// Finally push event is on right branch.
+	// so push event is on right branch.
 
 	// get SyncRepoConfig
 	syncrepoconfig := config.SyncRepoConfig{}
@@ -70,7 +70,6 @@ func (s SyncRepoService) SyncRepo(ctx context.Context, event *types.PushEventGit
 		if err != nil {
 			return err
 		}
-
 	}
 	return err
 }
@@ -79,5 +78,11 @@ func CleanTempDir(path string) {
 	err := os.RemoveAll(path)
 	if err != nil {
 		// TODO: Add Logs error removing tempdir"
+	}
+}
+
+func InitSyncRepoServices(gitService git.Services) *syncRepoService {
+	return &syncRepoService{
+		GitService: gitService,
 	}
 }
