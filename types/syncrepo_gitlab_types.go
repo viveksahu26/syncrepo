@@ -1,7 +1,13 @@
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
+type SyncRepoService interface {
+	SyncRepo(ctx context.Context, event *PushEventGitlab) error
+}
 type PushEventGitlab struct {
 	ObjectKind   string      `json:"object_kind"`
 	EventName    string      `json:"event_name"`
